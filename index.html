@@ -28,6 +28,14 @@ h2{margin:6px 0 0;font-size:17px}
 table{border-collapse:collapse;width:min(100%,360px);font-size:14px}
 th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
 .me{font-weight:700;color:#d94a3d}
+#start{position:fixed;inset:0;overflow:hidden;color:#fff;background:linear-gradient(135deg,#d94a3d,#e0a020,#2fa36b,#2f7fd1,#8a4fd1,#d94a3d);background-size:300% 300%;animation:bgshift 14s ease infinite;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:10}
+#start[hidden]{display:none}
+#start button{font-size:20px;padding:14px 38px;background:#fff;color:#2b2118;position:relative;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+#start h2,#start p{position:relative;text-shadow:0 3px 12px rgba(0,0,0,.35);opacity:1}
+#start i{position:absolute;bottom:-90px;border-radius:12px;background:rgba(255,255,255,.2);pointer-events:none;animation:rise linear infinite}
+@keyframes bgshift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes rise{to{transform:translateY(-120vh) rotate(180deg)}}
+@media (prefers-reduced-motion:reduce){#start,#start i{animation:none}}
 </style></head><body>
 <div id="app">
 <h1 id="ttl" aria-label="TileSlide" title="Tap me"></h1>
@@ -40,6 +48,7 @@ th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
 <h2>High scores</h2>
 <table><thead><tr><th>#</th><th>Name</th><th>Total moves</th></tr></thead><tbody id="hs"></tbody></table>
 <p>Scores are shared with all players.</p>
+<div id="start"><h2 style="font-size:44px;margin:0">TileSlide</h2><button id="st">▶ Start</button></div>
 <div id="menu" hidden><div><b>Welcome back</b><span id="mt"></span><button id="rsm">Resume</button><button id="nw">New game</button></div></div>
 </div>
 <script>
@@ -234,6 +243,8 @@ const muBtn=()=>{$('mu').textContent=mute?'\u{1F507} Sound off':'\u{1F50A} Sound
 const playBgm=()=>{if(!mute)bgm.play().catch(()=>{})};
 $('mu').onclick=()=>{mute=!mute;sv('rs_mute',mute);muBtn();mute?bgm.pause():playBgm()};
 muBtn();
+for(let k=0;k<16;k++){const t=document.createElement('i'),z=24+Math.random()*50;t.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;animation-duration:${8+Math.random()*10}s;animation-delay:-${Math.random()*14}s`;$('start').prepend(t)}
+$('st').onclick=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}playBgm();$('start').hidden=true};
 addEventListener('pointerdown',playBgm,{once:true});
 addEventListener('keydown',playBgm,{once:true});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){wasP=!bgm.paused;bgm.pause()}else if(wasP&&!mute)playBgm()});
