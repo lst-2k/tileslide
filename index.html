@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>TileSlide</title>
 <style>
 :root{--bg:#f4efe6;--fg:#2b2118;--tile:#fbf7ef;--slot:#d9cdb8;--anc:#efe3cc;--btn:#2b2118;--btnfg:#f4efe6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1814;--fg:#efe6d6;--tile:#3a3228;--slot:#14110e;--anc:#4a3e30;--btn:#efe6d6;--btnfg:#1c1814}}
 :root[data-theme="dark"]{--bg:#1c1814;--fg:#efe6d6;--tile:#3a3228;--slot:#14110e;--anc:#4a3e30;--btn:#efe6d6;--btnfg:#1c1814}
-html,body{margin:0;height:100%}
+html,body{margin:0;height:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
+button,canvas,#start,h1{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
 #app{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 12px;max-width:100%}
 h1{margin:0;font-size:42px;font-weight:800;letter-spacing:1px;display:flex;cursor:pointer;user-select:none}
@@ -213,6 +214,7 @@ $('go').onclick=()=>{if(done)return newGame();total+=moves;moves=0;level++;newPu
 let armed=0;$('ng').onclick=()=>{if(armed){armed=0;$('ng').textContent='New game';newGame()}else{armed=1;$('ng').textContent='Tap again to confirm';setTimeout(()=>{armed=0;$('ng').textContent='New game'},3000)}};
 $('nm').value=ld('rs_name','');$('nm').oninput=()=>sv('rs_name',$('nm').value);
 addEventListener('resize',()=>{setup();kick()});
+['gesturestart','dblclick'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault()));
 const T=$('ttl');'TileSlide'.split('').forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.style.setProperty('--i',i);s.style.color=['#d94a3d','#2f7fd1','#2fa36b','#e0a020'][i%4];T.appendChild(s)});
 T.onclick=()=>{T.childNodes.forEach(s=>{s.style.animation='none';void s.offsetWidth;s.style.animation=''})};
 let AC;
