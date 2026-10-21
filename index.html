@@ -16,15 +16,15 @@ h1 span:hover{transform:translateY(-6px) scale(1.2) rotate(-6deg)}
 @keyframes pop{0%{transform:scale(0) rotate(-25deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
 @media (prefers-reduced-motion:reduce){h1 span{animation:none}}
 #bar{display:flex;gap:18px;font-size:15px;opacity:.85}
-canvas{touch-action:manipulation;border-radius:12px}
+canvas{touch-action:none;border-radius:12px}
 #msg{min-height:22px;font-weight:600;font-size:16px}
 button{background:var(--btn);color:var(--btnfg);border:0;border-radius:10px;padding:10px 16px;font-size:15px;cursor:pointer}
 #btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 p{margin:0;font-size:13px;opacity:.7;text-align:center;max-width:440px}
-#menu{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5}
-#menu[hidden]{display:none}
-#menu div{background:var(--bg);padding:22px;border-radius:14px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
-input{font-size:15px;padding:8px 10px;border-radius:8px;border:1px solid var(--slot);background:var(--tile);color:var(--fg);width:150px;text-align:center}
+#menu,#nask{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5}
+#menu[hidden],#nask[hidden]{display:none}
+#menu div,#nask div{background:var(--bg);padding:22px;border-radius:14px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+input{font-size:16px;padding:8px 10px;border-radius:8px;border:1px solid var(--slot);background:var(--tile);color:var(--fg);width:150px;text-align:center}
 h2{margin:6px 0 0;font-size:17px}
 table{border-collapse:collapse;width:min(100%,360px);font-size:14px}
 th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
@@ -36,7 +36,15 @@ th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
 #start i{position:absolute;bottom:-90px;border-radius:12px;background:rgba(255,255,255,.2);pointer-events:none;animation:rise linear infinite}
 @keyframes bgshift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 @keyframes rise{to{transform:translateY(-120vh) rotate(180deg)}}
+#start input{position:relative;width:220px;font-size:18px;padding:12px;margin:0}
+#start input.err{outline:3px solid #fff;animation:shk .3s}
+@keyframes shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#start,#menu,#nask{touch-action:none;overscroll-behavior:contain}
 @media (prefers-reduced-motion:reduce){#start,#start i{animation:none}}
+#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:8}
+#ban{position:fixed;left:0;right:0;top:28%;text-align:center;font-size:44px;font-weight:800;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.65);pointer-events:none;z-index:9;opacity:0}
+#ban.show{animation:banpop 2s ease both}
+@keyframes banpop{0%{transform:scale(.3);opacity:0}15%{transform:scale(1.15);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
 </style></head><body>
 <div id="app">
 <h1 id="ttl" aria-label="TileSlide" title="Tap me"></h1>
@@ -49,7 +57,9 @@ th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
 <h2>High scores</h2>
 <table><thead><tr><th>#</th><th>Name</th><th>Total moves</th></tr></thead><tbody id="hs"></tbody></table>
 <p>Scores are shared with all players.</p>
-<div id="start"><h2 style="font-size:44px;margin:0">TileSlide</h2><button id="st">▶ Start</button></div>
+<div id="nask" hidden><div><b>You finished! Add your name to the leaderboard</b><input id="nm2" maxlength="14" placeholder="Your name" aria-label="Your name"><button id="nsv">Save score</button><button id="nsk">Skip</button></div></div>
+<canvas id="cf"></canvas><div id="ban"></div>
+<div id="start"><h2 style="font-size:44px;margin:0">TileSlide</h2><input id="nm0" maxlength="14" placeholder="Enter your name" aria-label="Your name"><button id="st">▶ Start</button></div>
 <div id="menu" hidden><div><b>Welcome back</b><span id="mt"></span><button id="rsm">Resume</button><button id="nw">New game</button></div></div>
 </div>
 <script>
@@ -122,7 +132,9 @@ function gen(){
 }
 function save(){if(done)return;sv('rs_save',{level,total,moves,won,N,init,grid,ropes})}
 async function renderScores(){let l;try{l=window.fbScores?await window.fbScores.top():ld('rs_scores',[])}catch(e){l=ld('rs_scores',[])}$('hs').innerHTML=l.length?l.map((e,i)=>'<tr'+(e.t===lastT?' class="me"':'')+'><td>'+(i+1)+'</td><td>'+esc(e.n)+'</td><td>'+e.s+'</td></tr>').join(''):'<tr><td colspan="3">No scores yet</td></tr>'}
-async function finish(){done=true;const t=Date.now(),e={n:($('nm').value.trim()||'Anonymous').slice(0,14),s:total+moves,t},l=ld('rs_scores',[]);l.push(e);l.sort((a,b)=>a.s-b.s||a.t-b.t);sv('rs_scores',l.slice(0,10));lastT=t;rm('rs_save');try{if(window.fbScores)await window.fbScores.add(e)}catch(x){}renderScores()}
+let pend=0;
+async function submit(name){const t=Date.now(),e={n:name.slice(0,14),s:pend,t},l=ld('rs_scores',[]);l.push(e);l.sort((a,b)=>a.s-b.s||a.t-b.t);sv('rs_scores',l.slice(0,10));lastT=t;try{if(window.fbScores)await window.fbScores.add(e)}catch(x){}renderScores()}
+function finish(){done=true;pend=total+moves;rm('rs_save');const n=$('nm').value.trim();if(n)submit(n);else{$('nask').hidden=false;$('nm2').focus()}}
 function newGame(){level=1;total=0;moves=0;done=false;newPuzzle()}
 function resume(s){level=s.level;total=s.total;moves=s.moves;won=s.won;N=s.N;init=s.init;grid=s.grid;ropes=s.ropes;done=false;setup();check();hud();kick()}
 function load(){
@@ -161,7 +173,7 @@ function tryMove(i){
   for(let c=e+dy*N+dx;;c+=dy*N+dx){if(grid[c].f)return;if(c==i)break}
   let cur=e;while(cur!=i){const nx=cur+dy*N+dx;grid[cur]=grid[nx];cur=nx}
   grid[i]=null;moves++;const pl=lnk,ok=check();
-  if(ok){won=true;if(level>=FINAL)finish();sfx(level>=FINAL?'fin':'win')}else sfx(lnk>pl?'link':'slide');
+  if(ok){won=true;const fin=level>=FINAL;if(fin)finish();sfx(fin?'fin':'win');fanfare(fin)}else sfx(lnk>pl?'link':'slide');
   hud();kick();save();
 }
 function setup(){
@@ -205,18 +217,48 @@ cv.addEventListener('pointerdown',e=>{
   if(inb(x,y)&&grid[idx(x,y)])tryMove(idx(x,y));
 });
 addEventListener('keydown',e=>{
-  const d={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3}[e.key];if(d===undefined)return;
+  if(e.target.tagName==='INPUT')return;const d={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3}[e.key];if(d===undefined)return;
   e.preventDefault();const g=grid.indexOf(null),sx=g%N-DX[d],sy=(g/N|0)-DY[d];
   if(inb(sx,sy)&&grid[idx(sx,sy)])tryMove(idx(sx,sy));
 });
 $('rs').onclick=()=>{if(!won&&!done)load()};
 $('go').onclick=()=>{if(done)return newGame();total+=moves;moves=0;level++;newPuzzle()};
 let armed=0;$('ng').onclick=()=>{if(armed){armed=0;$('ng').textContent='New game';newGame()}else{armed=1;$('ng').textContent='Tap again to confirm';setTimeout(()=>{armed=0;$('ng').textContent='New game'},3000)}};
-$('nm').value=ld('rs_name','');$('nm').oninput=()=>sv('rs_name',$('nm').value);
+$('nm').value=$('nm0').value=ld('rs_name','');
+$('nm').oninput=()=>{$('nm0').value=$('nm').value;sv('rs_name',$('nm').value)};
+$('nm0').oninput=()=>{$('nm0').classList.remove('err');$('nm').value=$('nm0').value;sv('rs_name',$('nm0').value)};
+$('nm0').onkeydown=e=>{if(e.key==='Enter')$('st').click()};
+const hideAsk=()=>{$('nask').hidden=true};
+$('nsv').onclick=()=>{const n=$('nm2').value.trim();if(!n){$('nm2').focus();return}$('nm').value=$('nm0').value=n;sv('rs_name',n);hideAsk();submit(n)};
+$('nsk').onclick=hideAsk;
+$('nm2').onkeydown=e=>{if(e.key==='Enter')$('nsv').click()};
 addEventListener('resize',()=>{setup();kick()});
 ['gesturestart','dblclick'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault()));
+document.addEventListener('touchmove',e=>{if(e.touches.length>1||e.target===cv)e.preventDefault()},{passive:false});
 const T=$('ttl');'TileSlide'.split('').forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.style.setProperty('--i',i);s.style.color=['#d94a3d','#2f7fd1','#2fa36b','#e0a020'][i%4];T.appendChild(s)});
 T.onclick=()=>{T.childNodes.forEach(s=>{s.style.animation='none';void s.offsetWidth;s.style.animation=''})};
+const cfCv=$('cf'),cfCx=cfCv.getContext('2d');let parts=[],cfRun=false;
+const CFC=['#d94a3d','#e0a020','#2fa36b','#2f7fd1','#8a4fd1','#ffffff'];
+function mk(x,y,vx,vy){parts.push({x,y,vx,vy,w:6+Math.random()*6,h:4+Math.random()*5,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:CFC[rnd(CFC.length)]})}
+function cfTick(){
+  cfCx.clearRect(0,0,cfCv.width,cfCv.height);
+  parts.forEach(p=>{p.vy+=.25;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+    cfCx.save();cfCx.translate(p.x,p.y);cfCx.rotate(p.r);cfCx.fillStyle=p.c;cfCx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cfCx.restore()});
+  parts=parts.filter(p=>p.y<innerHeight+20);
+  if(parts.length)requestAnimationFrame(cfTick);else{cfRun=false;cfCx.clearRect(0,0,cfCv.width,cfCv.height)}
+}
+function cfGo(){if(!cfRun){cfRun=true;requestAnimationFrame(cfTick)}}
+function confetti(n,big){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  cfCv.width=innerWidth;cfCv.height=innerHeight;
+  (big?[[.2,.65],[.5,.55],[.8,.65]]:[[.5,.6]]).forEach(([bx,by],bi)=>setTimeout(()=>{
+    for(let i=0;i<n;i++){const a=-Math.PI/2+(Math.random()-.5)*2.4,v=6+Math.random()*(big?12:8);mk(innerWidth*bx,innerHeight*by,Math.cos(a)*v,Math.sin(a)*v)}
+    cfGo();
+  },bi*350));
+  if(big){let k=0;const iv=setInterval(()=>{for(let i=0;i<8;i++)mk(Math.random()*innerWidth,-10,(Math.random()-.5)*2,2+Math.random()*3);cfGo();if(++k>45)clearInterval(iv)},100)}
+}
+function banner(t,long){const b=$('ban');b.textContent=t;b.style.animationDuration=long?'3.6s':'2s';b.classList.remove('show');void b.offsetWidth;b.classList.add('show')}
+function fanfare(fin){confetti(fin?120:60,fin);banner(fin?'\u{1F3C6} You did it! \u{1F3C6}':'Level '+level+' complete!',fin)}
 let AC;
 function sfx(kind){
   if(mute)return;
@@ -246,7 +288,7 @@ const playBgm=()=>{if(!mute)bgm.play().catch(()=>{})};
 $('mu').onclick=()=>{mute=!mute;sv('rs_mute',mute);muBtn();mute?bgm.pause():playBgm()};
 muBtn();
 for(let k=0;k<16;k++){const t=document.createElement('i'),z=24+Math.random()*50;t.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;animation-duration:${8+Math.random()*10}s;animation-delay:-${Math.random()*14}s`;$('start').prepend(t)}
-$('st').onclick=()=>{try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}playBgm();$('start').hidden=true};
+$('st').onclick=()=>{if(!$('nm0').value.trim()){$('nm0').classList.add('err');$('nm0').focus();return}try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}playBgm();$('start').hidden=true};
 addEventListener('pointerdown',playBgm,{once:true});
 addEventListener('keydown',playBgm,{once:true});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){wasP=!bgm.paused;bgm.pause()}else if(wasP&&!mute)playBgm()});
