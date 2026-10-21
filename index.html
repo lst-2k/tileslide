@@ -45,6 +45,9 @@ th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
 #ban{position:fixed;left:0;right:0;top:28%;text-align:center;font-size:44px;font-weight:800;color:#fff;text-shadow:0 3px 14px rgba(0,0,0,.65);pointer-events:none;z-index:9;opacity:0}
 #ban.show{animation:banpop 2s ease both}
 @keyframes banpop{0%{transform:scale(.3);opacity:0}15%{transform:scale(1.15);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+body::before{content:"";position:fixed;inset:-30%;z-index:-1;pointer-events:none;background:radial-gradient(circle at 20% 28%,rgba(217,74,61,.3),transparent 42%),radial-gradient(circle at 80% 22%,rgba(47,127,209,.3),transparent 42%),radial-gradient(circle at 28% 78%,rgba(47,163,107,.3),transparent 42%),radial-gradient(circle at 82% 82%,rgba(224,160,32,.3),transparent 42%);animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(-5%,-4%) rotate(-8deg) scale(1)}to{transform:translate(5%,4%) rotate(12deg) scale(1.2)}}
+@media (prefers-reduced-motion:reduce){body::before{animation:none}}
 </style></head><body>
 <div id="app">
 <h1 id="ttl" aria-label="TileSlide" title="Tap me"></h1>
