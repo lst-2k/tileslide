@@ -10,11 +10,16 @@ html,body{margin:0;height:100%;touch-action:manipulation;-webkit-tap-highlight-c
 button,canvas,#start,h1{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
 body{background:var(--bg);color:var(--fg);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center}
 #app{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 12px;max-width:100%}
-h1{margin:0;font-size:42px;font-weight:800;letter-spacing:1px;display:flex;cursor:pointer;user-select:none}
-h1 span{display:inline-block;transition:transform .2s;animation:pop .6s cubic-bezier(.3,1.6,.5,1) backwards;animation-delay:calc(var(--i)*70ms)}
-h1 span:hover{transform:translateY(-6px) scale(1.2) rotate(-6deg)}
+.hdr{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:8px 14px;border-radius:18px;font-size:var(--fs,min(26px,5.4vw));background:linear-gradient(160deg,rgba(255,255,255,.6),rgba(255,255,255,.14));box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -5px 0 rgba(0,0,0,.18),0 6px 12px rgba(0,0,0,.3);cursor:pointer;position:relative;-webkit-user-select:none;user-select:none}
+.hdr.big{--fs:min(44px,6vw);padding:12px 18px}
+.word{display:flex;gap:2px}
+.lt{display:inline-flex;align-items:center;justify-content:center;width:1.05em;height:1.15em;font-weight:900;color:#fff;border-radius:.22em;background:linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,0) 50%,rgba(0,0,0,.16)),var(--c);box-shadow:inset 0 .06em 0 rgba(255,255,255,.55),inset 0 -.12em 0 rgba(0,0,0,.28),0 .12em .18em rgba(0,0,0,.4);text-shadow:0 .05em .05em rgba(0,0,0,.45);animation:pop .6s cubic-bezier(.3,1.6,.5,1) backwards calc(var(--i)*70ms),bob 2.6s ease-in-out calc(1s + var(--i)*120ms) infinite}
 @keyframes pop{0%{transform:scale(0) rotate(-25deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-@media (prefers-reduced-motion:reduce){h1 span{animation:none}}
+@keyframes bob{50%{transform:translateY(-.1em) rotate(-2deg)}}
+.art{width:1.5em;height:1.5em;flex:none;filter:drop-shadow(0 .06em .06em rgba(0,0,0,.4))}
+.art.col{display:flex;flex-direction:column;gap:.12em;width:auto;height:auto}
+.mt{display:inline-flex;align-items:center;justify-content:center;font-size:.5em;width:1.4em;height:1.4em;border-radius:.25em;color:rgba(255,255,255,.92);background:linear-gradient(160deg,rgba(255,255,255,.42),rgba(255,255,255,0) 50%,rgba(0,0,0,.16)),var(--c);box-shadow:inset 0 .08em 0 rgba(255,255,255,.55),inset 0 -.18em 0 rgba(0,0,0,.28),0 .2em .3em rgba(0,0,0,.4)}
+@media (prefers-reduced-motion:reduce){.lt{animation:none}}
 #bar{display:flex;gap:18px;font-size:15px;opacity:.85}
 canvas{touch-action:none;border-radius:12px}
 #msg{min-height:22px;font-weight:600;font-size:16px}
@@ -26,8 +31,14 @@ p{margin:0;font-size:13px;opacity:.7;text-align:center;max-width:440px}
 #menu div,#nask div{background:var(--bg);padding:22px;border-radius:14px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
 input{font-size:16px;padding:8px 10px;border-radius:8px;border:1px solid var(--slot);background:var(--tile);color:var(--fg);width:150px;text-align:center}
 h2{margin:6px 0 0;font-size:17px}
-table{border-collapse:collapse;width:min(100%,360px);font-size:14px}
-th,td{padding:5px 8px;text-align:left;border-bottom:1px solid var(--slot)}
+table{border-collapse:separate;border-spacing:5px;width:min(100%,400px);font-size:14px}
+th{padding:2px 8px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.6px;opacity:.7}
+td{padding:10px;text-align:left;border-radius:10px;background:linear-gradient(160deg,rgba(255,255,255,.55),rgba(255,255,255,.12));box-shadow:inset 0 2px 0 rgba(255,255,255,.5),inset 0 -4px 0 rgba(0,0,0,.2),0 4px 6px rgba(0,0,0,.28)}
+td:first-child{text-align:center;font-weight:800;width:34px}
+tbody tr:nth-child(1) td:first-child{background:linear-gradient(160deg,rgba(255,255,255,.45),rgba(255,255,255,0) 50%),#e0a020;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+tbody tr:nth-child(2) td:first-child{background:linear-gradient(160deg,rgba(255,255,255,.45),rgba(255,255,255,0) 50%),#aab1b8;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+tbody tr:nth-child(3) td:first-child{background:linear-gradient(160deg,rgba(255,255,255,.45),rgba(255,255,255,0) 50%),#c8794a;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+
 .me{font-weight:700;color:#d94a3d}
 #start{position:fixed;inset:0;overflow:hidden;color:#fff;background:linear-gradient(135deg,#d94a3d,#e0a020,#2fa36b,#2f7fd1,#8a4fd1,#d94a3d);background-size:300% 300%;animation:bgshift 14s ease infinite;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;z-index:10}
 #start[hidden]{display:none}
@@ -50,7 +61,7 @@ body::before{content:"";position:fixed;inset:-30%;z-index:-1;pointer-events:none
 @media (prefers-reduced-motion:reduce){body::before{animation:none}}
 </style></head><body>
 <div id="app">
-<h1 id="ttl" aria-label="TileSlide" title="Tap me"></h1>
+<div id="ttl" class="hdr" role="img" aria-label="TileSlide"></div>
 <input id="nm" maxlength="14" placeholder="Your name" aria-label="Your name">
 <div id="bar"><span id="lv"></span><span id="mv"></span></div>
 <canvas id="c"></canvas>
@@ -62,7 +73,7 @@ body::before{content:"";position:fixed;inset:-30%;z-index:-1;pointer-events:none
 <p>Scores are shared with all players.</p>
 <div id="nask" hidden><div><b>You finished! Add your name to the leaderboard</b><input id="nm2" maxlength="14" placeholder="Your name" aria-label="Your name"><button id="nsv">Save score</button><button id="nsk">Skip</button></div></div>
 <canvas id="cf"></canvas><div id="ban"></div>
-<div id="start"><h2 style="font-size:44px;margin:0">TileSlide</h2><input id="nm0" maxlength="14" placeholder="Enter your name" aria-label="Your name"><button id="st">▶ Start</button></div>
+<div id="start"><div id="sttl" class="hdr big" role="img" aria-label="TileSlide"></div><input id="nm0" maxlength="14" placeholder="Enter your name" aria-label="Your name"><button id="st">▶ Start</button></div>
 <div id="menu" hidden><div><b>Welcome back</b><span id="mt"></span><button id="rsm">Resume</button><button id="nw">New game</button></div></div>
 </div>
 <script>
@@ -249,8 +260,13 @@ $('nm2').onkeydown=e=>{if(e.key==='Enter')$('nsv').click()};
 addEventListener('resize',()=>{setup();kick()});
 ['gesturestart','dblclick'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault()));
 document.addEventListener('touchmove',e=>{if(e.touches.length>1||e.target===cv)e.preventDefault()},{passive:false});
-const T=$('ttl');'TileSlide'.split('').forEach((ch,i)=>{const s=document.createElement('span');s.textContent=ch;s.style.setProperty('--i',i);s.style.color=['#d94a3d','#2f7fd1','#2fa36b','#e0a020'][i%4];T.appendChild(s)});
-T.onclick=()=>{T.childNodes.forEach(s=>{s.style.animation='none';void s.offsetWidth;s.style.animation=''})};
+const HC=['#d94a3d','#2f7fd1','#2fa36b','#e0a020','#8a4fd1'];
+function mkHdr(el,word,art){
+  el.innerHTML=art('#d94a3d',0)+'<div class="word">'+[...word].map((ch,i)=>'<span class="lt" style="--i:'+i+';--c:'+HC[i%5]+'">'+ch+'</span>').join('')+'</div>'+art('#2f7fd1',1);
+  el.onclick=()=>el.querySelectorAll('.lt').forEach(s=>{s.style.animation='none';void s.offsetWidth;s.style.animation=''});
+}
+const ropeArt=(c,f)=>'<svg class="art" viewBox="0 0 60 60" style="transform:scaleX('+(f?-1:1)+')"><path d="M6 56Q6 16 56 16" fill="none" stroke="#a8773f" stroke-width="13"/><path d="M6 56Q6 16 56 16" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="13" stroke-dasharray="3 5"/><circle cx="12" cy="50" r="10" fill="'+c+'" stroke="#fff" stroke-width="3"/><circle cx="12" cy="50" r="3.5" fill="#fff"/></svg>';
+mkHdr($('ttl'),'TileSlide',ropeArt);mkHdr($('sttl'),'TileSlide',ropeArt);
 const cfCv=$('cf'),cfCx=cfCv.getContext('2d');let parts=[],cfRun=false;
 const CFC=['#d94a3d','#e0a020','#2fa36b','#2f7fd1','#8a4fd1','#ffffff'];
 function mk(x,y,vx,vy){parts.push({x,y,vx,vy,w:6+Math.random()*6,h:4+Math.random()*5,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:CFC[rnd(CFC.length)]})}
