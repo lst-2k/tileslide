@@ -60,6 +60,43 @@ body::before{content:"";position:fixed;inset:-30%;z-index:-1;pointer-events:none
 @keyframes drift{from{transform:translate(-5%,-4%) rotate(-8deg) scale(1)}to{transform:translate(5%,4%) rotate(12deg) scale(1.2)}}
 @media (prefers-reduced-motion:reduce){body::before{animation:none}}
 </style></head><body>
+<!-- Floating Menu Button & Popup (Top Left) -->
+<div id="portal-menu-container" style="position: fixed; top: 20px; left: 20px; z-index: 9999; font-family: sans-serif;">
+    
+    <!-- 3-Line Square Menu Button -->
+    <button onclick="togglePortalMenu()" 
+            title="Menu"
+            style="width: 42px; height: 42px; background: #061811; color: #d4af37; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+        <span style="width: 20px; height: 2px; background-color: #d4af37; border-radius: 2px; transition: 0.3s;"></span>
+    </button>
+
+    <!-- Hidden Dropdown Menu (Opens Downward) -->
+    <div id="portal-menu-dropdown" style="display: none; margin-top: 10px; background: #061811; border: 2px solid #d4af37; border-radius: 10px; padding: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); min-width: 150px;">
+        <a href="https://lst-2k.github.io/mindgames/" 
+           style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #d4af37; text-decoration: none; font-size: 13px; font-weight: bold; padding: 8px 12px; border-radius: 6px; background: rgba(212, 175, 55, 0.1); transition: background 0.2s;"
+           onmouseover="this.style.background='rgba(212, 175, 55, 0.25)'" 
+           onmouseout="this.style.background='rgba(212, 175, 55, 0.1)'">
+           ← Back to Games
+        </a>
+    </div>
+</div>
+
+<script>
+    function togglePortalMenu() {
+        const menu = document.getElementById('portal-menu-dropdown');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Close menu when clicking outside of it
+    document.addEventListener('click', function(event) {
+        const container = document.getElementById('portal-menu-container');
+        if (container && !container.contains(event.target)) {
+            document.getElementById('portal-menu-dropdown').style.display = 'none';
+        }
+    });
+</script>
 <div id="app">
 <div id="ttl" class="hdr" role="img" aria-label="TileSlide"></div>
 <input id="nm" maxlength="14" placeholder="Your name" aria-label="Your name">
